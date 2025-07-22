@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الموظفين</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        #employees-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        #employees-list li {
+            border: 1px solid #ddd;
+            margin-top: -1px; /* Prevent double borders */
+            background-color: #f6f6f6;
+            padding: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>نظام إدارة الموظفين</h1>
+
+    <h2>إضافة موظف جديد</h2>
+    <form id="add-employee-form">
+        <input type="text" id="name" placeholder="الاسم" required>
+        <input type="text" id="department" placeholder="القسم" required>
+        <input type="number" id="salary" placeholder="الراتب" required>
+        <button type="submit">إضافة</button>
+    </form>
+
+    <h2>قائمة الموظفين</h2>
+    <ul id="employees-list"></ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchEmployees();
+
+            document.getElementById('add-employee-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const name = document.getElementById('name').value;
+                const department = document.getElementById('department').value;
+                const salary = document.getElementById('salary').value;
+                const id = Date.now(); // Simple ID generation for demo purposes
+
+                fetch('/employees/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id, name, department, salary }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    fetchEmployees();
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+
+        function fetchEmployees() {
+            fetch('/employees/')
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('employees-list');
+                    list.innerHTML = '';
+                    data.forEach(employee => {
+                        const item = document.createElement('li');
+                        item.textContent = `الاسم: ${employee.name}, القسم: ${employee.department}, الراتب: ${employee.salary}, معرف الموظف: ${employee.employee_id}`;
+                        list.appendChild(item);
+                    });
+                });
+        }
+    </script>
+
+</body>
+</html>
